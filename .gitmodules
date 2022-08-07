@@ -1,0 +1,3 @@
+[submodule "scale_AM"]
+	path = scale_AM
+	url = https://github.com/khbalhandawi/scale_AM.git
