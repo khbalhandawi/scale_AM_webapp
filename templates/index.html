@@ -13,28 +13,48 @@
     <link rel="stylesheet" href="{{ url_for("static", filename="css/main.css") }}">
   </head>
   <body>
-    <hr>
-    <h1>Scalability of remanufacturing</h1>
-    <hr>
-
+    <div class="content">
     <div class="row">
-      <div class="column">
+      <div class="column" id="headerColumn">
+        <hr>
+        <h1>Scalability of remanufacturing</h1>
+        <hr>
+      </div>
+    </div>
+    <div class="row">
+      <div class="column" id="leftColumn">
 
         <h2>Input your data</h2>
         <!-------------------- Input DOE data ------------------->
-        <div>
+        <div class="centerform">
           <p class="lead">Upload a csv file to view its data</p>
           <form id="preprocess" method="POST" enctype="multipart/form-data" action="/">
-              <input type="file" id=fileupload name="filename" accept=".csv">
-              <input type="submit">
+            <div class="row">   
+              <div class="column" id="dataMiniColumn">              
+                <input type="number" name="n_inputs" value="0" min="0" max="10" step="1" id="n_inputs">
+                <label for="n_inputs">Number of parameters</label>
+              </div>
+              <div class="column" id="dataColumn"> 
+                <input type="file" id=fileupload name="filename" accept=".csv">
+              </div>
+            </div>
+            <div class="row">   
+              <div class="column" id="dataMiniColumn">              
+                <input type="number" name="n_outputs" value="0" min="0" max="10" step="1" id="n_outputs">
+                <label for="n_outputs">Number of variables</label>
+              </div>
+              <div class="column" id="dataColumn"> 
+                <input type="submit">
+              </div>
+            </div>
           </form>
         </div>
-    
+
         <!------------------ Problem definition ----------------->
         <hr>
         <h2>Define the change effect and monotonicity vectors</h2>
     
-        <div>
+        <div class="centerform">
           <form id="define" method="POST">
               <input type="submit" value="Define Problem">
           </form>
@@ -67,10 +87,12 @@
                 
                 var nx = response.nx;
                 var nf = response.nf;
+                var i_labels = response.i_labels;
+                var o_labels = response.o_labels;
     
-                addInputTable(nx,"input");
-                addInputTable(nf,"output");
-                addJacobian(nx,nf);
+                addInputTable(nx,"input",i_labels);
+                addInputTable(nf,"output",o_labels);
+                addJacobian(nx,nf,i_labels,o_labels);
               },
               error: function(err) {
                 console.log(err);
@@ -81,13 +103,19 @@
         </script>
     
       </div>
-      <div class="column">
+      <div class="column" id="rightColumn">
         <!------------------ Problem projection ----------------->
         <h2>Here is a projection of the design space</h2>
 
         <div class="centerform">
-          <form id="predict" method="POST">
+          <form id="predict" method="POST" enctype="multipart/form-data">
+            <div class="row">             
+              <input type="number" name="resolution" value="20" min="10" max="200" step="1" id="resolution">
+              <label for="resolution">Resolution</label>
+              <input type="checkbox" name="intersect" value="" id="intersect">
+              <label for="intersect">Intersection</label>
               <input type="submit" value="Plot projection">
+            </div>
           </form>
         </div>
 
@@ -95,7 +123,8 @@
 
         <div class="centerform">
           <form method ="post" enctype="multipart/form-data" id="changeBand">
-                <input id="slide" type="range" min="0.5" max="10" step="0.1" value="1" name="slide">
+                <label for="slide">Kernel bandwidth</label>
+                <input id="slide" type="range" min="0" max="100" step="0.1" value="43.5" name="slide">
                 <div id="sliderAmount"></div>
           </form>
         </div>
@@ -117,6 +146,6 @@
 
       </div>
     </div>
-
+    </div>
   </body>
 </html>

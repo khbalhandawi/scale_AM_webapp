@@ -25,7 +25,7 @@ function addSlider(obj) {
     }
 }
 
-function addInputTable(n_var,type) {
+function addInputTable(n_var,type,labels) {
 
     console.log(n_var);
     var myTableDiv = document.getElementById(type);
@@ -70,11 +70,7 @@ function addInputTable(n_var,type) {
 
         // labels
         var td = document.createElement("TD");
-        if (type == "input") {
-            td.appendChild(document.createTextNode("x"+(i+1)));
-        } else if (type == "output") {
-            td.appendChild(document.createTextNode("f"+(i+1)));
-        }
+        td.appendChild(document.createTextNode(labels[i])); // variable label
         td.width="25";
         tr.appendChild(td);
         
@@ -157,7 +153,7 @@ function addInputTable(n_var,type) {
     
 }
 
-function addJacobian(nrows, ncols) {
+function addJacobian(nrows, ncols, i_labels, o_labels) {
 
     console.log(nrows);
     console.log(ncols);
@@ -174,7 +170,7 @@ function addJacobian(nrows, ncols) {
     for (var j=0; j<ncols; j++){
         var th = document.createElement("TH");
         tableHead.appendChild(th);
-        th.appendChild(document.createTextNode("f"+(j+1)));
+        th.appendChild(document.createTextNode(o_labels[j]));
     }
 
     var tableBody = document.createElement("TBODY");
@@ -184,7 +180,7 @@ function addJacobian(nrows, ncols) {
         var tr = document.createElement("TR");
         tableBody.appendChild(tr);
         var td = document.createElement("TD");
-        td.appendChild(document.createTextNode("x"+(i+1)));
+        td.appendChild(document.createTextNode(i_labels[i]));
         td.width="25";
         tr.appendChild(td);
         for (var j=0; j<ncols; j++){

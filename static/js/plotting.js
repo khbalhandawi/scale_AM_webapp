@@ -2,7 +2,10 @@ function plot_contour() {
     var json = {};
 
     var sliderElement = document.getElementById("slide");
-    json["bandwidth"] = sliderElement.value;
+    if (sliderElement.value <= 50)
+      json["bandwidth"] = 10**(0.02*(sliderElement.value-50)); // log scale
+    else
+      json["bandwidth"] = 9/5 * (sliderElement.value - 50) + 1; // linear scale
 
     json["x-axis"] = getRadioValue("axis-"+1);
     json["y-axis"] = getRadioValue("axis-"+2);
@@ -20,6 +23,12 @@ function plot_contour() {
 
     json["Jacobian"] = getJacobian();
 
+    var numberElement = document.getElementById("resolution");
+    json["resolution"] = numberElement.value;
+
+    var checkboxElement = document.getElementById("intersect");
+    json["intersect"] = checkboxElement.checked;
+
     var jsonStr=JSON.stringify(json);
     console.log(jsonStr);
 
@@ -36,34 +45,42 @@ function plot_contour() {
 
         canvas = document.getElementById("canvas");
 
-        // var data_1 = [{
-        //   z: [[10, 10.625, 12.5, 15.625, 20],
-        //       [5.625, 6.25, 8.125, 11.25, 15.625],
-        //       [2.5, 3.125, 5., 8.125, 12.5],
-        //       [0.625, 1.25, 3.125, 6.25, 10.625],
-        //       [0, 0.625, 2.5, 5.625, 10]],
-        //   x: [-9, -6, -5 , -3, -1],
-        //   y: [0, 1, 4, 5, 7],
-        //   type: "contour"
-        // }];
-
         var data = [{
             z: response.z,
             x: response.x,
             y: response.y,
             type: "contour",
             colorbar:{
-            title: "Color Bar Title",
-            titleside: "right",
-            titlefont: {
-              size: 14,
-              family: "Arial, sans-serif"
-            }
-            }
+              title: response.labels["zlabel"],
+              side: "top",
+              titlefont: {
+                size: 14,
+                family: "Arial, sans-serif"
+              },
+              borderwidth: 1,
+              xpad: 10
+            },
+            showlegend: false
         }];
 
         var layout = {
-          title: "Setting the X and Y Coordinates in a Contour Plot"
+          xaxis: {
+            title: response.labels["xlabel"]
+          },
+          yaxis: {
+            title: response.labels["ylabel"]
+          },
+          legend: {
+            yanchor:'top',
+            xanchor:'center',
+            "orientation": "h",
+            x: 0.5,
+            y: 1.1,
+            font: {
+              size: 14
+            },
+            borderwidth: 1
+          }
         };  
         
         Plotly.newPlot(canvas, data, layout);
@@ -71,14 +88,15 @@ function plot_contour() {
         var colors = ["#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
         var i = 0
         for (const cstr of response.cstrs) {
-            color = colors[i % colors.length]
+            var color = colors[cstr.order % colors.length]
+            var color_1 = colors[(cstr.order+1) % colors.length]
             var cs = [
                 ["0.0", color],
-                ["1.0", "rgb(49,54,149)"]
+                ["1.0", color_1]
             ];
 
             var j = {
-                z: cstr,
+                z: cstr.values_line,
                 x: response.x,
                 y: response.y,
                 opacity: 0.5,
@@ -88,36 +106,45 @@ function plot_contour() {
                 showscale: false,
                 line:{
                     smoothing: 1.0,
-                    width: 3.0
+                    width: 5.0
                 },
                 contours:{
                     coloring: "lines"
-                }
+                },
+                hoverinfo: "skip",
+                showlegend: false
             };
             // data.push(j);
             // add a single trace to an existing graphDiv
             Plotly.addTraces(canvas, j);
 
+            var cs = [
+              ["0.0", color],
+              ["1.0", color]
+            ];
             var j = {
-                z: cstr,
+                z: cstr.values,
                 x: response.x,
                 y: response.y,
-                opacity: 0.2,
+                name: cstr.label,
+                opacity: 0.3,
                 ncontours : 2,
                 type: "contour",
                 colorscale: cs,
                 showscale: false,
+                hoverinfo: "skip",
+                showlegend: true
             };
             // data.push(j);
             // add a single trace to an existing graphDiv
             Plotly.addTraces(canvas, j);
             i++;
         }
-        return
+        return;
       },
       error: function(err) {
         console.log(err);
       }
     });
-    return false
+    return false;
 }

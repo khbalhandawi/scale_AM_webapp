@@ -23,22 +23,67 @@ html, body {
   p {
     text-align: left;
   }
+  .content {
+    border: 1px solid red;
+    max-width: 1000px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .JacobianTable, .output, .input {
+    text-align: center;
+  }
+  table {
+    border:1px solid black;
+    margin-left:auto;
+    margin-right:auto;
+  }
   .centerform, .slider {
     text-align: center;
   }
   .plotcontainer {
-    background-color: lightblue;
-    overflow: scroll;
-    margin-left: auto;
-    margin-right: auto;
+    background-color: none;
+    overflow: none;
+    margin-left: none;
+    margin-right: none;
     border: none;
     text-align: center;
-    width: 650px;
-    height: 600px;
+    float: center;
+    width: 100%;
+    height: 550px;
+  }
+  th {
+    text-align: center;
+  }
+  .lead {
+    text-align: center;
+  }
+  .row {
+    text-align: left;
   }
   .column {
     float: left;
+    width: 25%;
+  }
+  #leftColumn {
     width: 50%;
+    box-sizing: border-box;
+  }
+  #rightColumn {
+    border-left: 1px solid black;
+    width: 50%;
+    box-sizing: border-box;
+  }
+  #dataColumn {
+    float: left;
+    width: 40%;
+  }
+  #dataMiniColumn {
+    float: left;
+    width: 60%;
+  }
+  #headerColumn {
+    float: center;
+    width: 100%;
   }
   /* Clear floats after the columns */
   .row:after {
