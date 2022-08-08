@@ -5,79 +5,118 @@
     <meta charset="utf-8" />
     <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/handsontable@9.0.1/dist/handsontable.full.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/0.10.0/lodash.min.js"></script>
     <script src="static/js/app.js"></script>
+    <script src="static/js/plotting.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/handsontable@9.0.1/dist/handsontable.full.min.css" rel="stylesheet" media="screen">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for("static", filename="css/main.css") }}">
   </head>
   <body>
     <hr>
-
-    <!-------------------- Input DOE data ------------------->
-
-    <h1>COVID-19 weekly forecaster</h1>
-    <p>Disclaimer: This platform was trained on retrospective data, has not gone through prospective validation, and is not intended for clinical use. A manuscript describing the model has been submitted for publication and is currently under review.</p>
+    <h1>Scalability of remanufacturing</h1>
     <hr>
-    <h2>Input your data</h2>
 
-    <div>
-      <p class="lead">Upload a csv file to view its data.</p>
-      <form id="preprocess" method="POST" enctype="multipart/form-data" action="/">
-          <input type="file" id=fileupload name="filename" accept=".csv">
-          <input type="submit">
-      </form>
+    <div class="row">
+      <div class="column">
+
+        <h2>Input your data</h2>
+        <!-------------------- Input DOE data ------------------->
+        <div>
+          <p class="lead">Upload a csv file to view its data</p>
+          <form id="preprocess" method="POST" enctype="multipart/form-data" action="/">
+              <input type="file" id=fileupload name="filename" accept=".csv">
+              <input type="submit">
+          </form>
+        </div>
+    
+        <!------------------ Problem definition ----------------->
+        <hr>
+        <h2>Define the change effect and monotonicity vectors</h2>
+    
+        <div>
+          <form id="define" method="POST">
+              <input type="submit" value="Define Problem">
+          </form>
+        </div>
+    
+        <!-- Input tables -->
+        <p class="lead">Assign change effect values</p>
+        <div id="input">
+        </div>
+    
+        <p class="lead">Assign monotonicity values</p>
+        <div id="output">
+        </div>
+    
+        <p class="lead">Choose Jacobian components to plot</p>
+        <div id="JacobianTable">
+        </div>
+    
+        <script>
+          $("form#define").submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+              url: "/api/define",
+              type: "POST",
+              data: {},
+              success: function(response) {
+                deleteTable("input");
+                deleteTable("output");
+                deleteTable("JacobianTable");
+                
+                var nx = response.nx;
+                var nf = response.nf;
+    
+                addInputTable(nx,"input");
+                addInputTable(nf,"output");
+                addJacobian(nx,nf);
+              },
+              error: function(err) {
+                console.log(err);
+              }
+            });
+            return false
+          });
+        </script>
+    
+      </div>
+      <div class="column">
+        <!------------------ Problem projection ----------------->
+        <h2>Here is a projection of the design space</h2>
+
+        <div class="centerform">
+          <form id="predict" method="POST">
+              <input type="submit" value="Plot projection">
+          </form>
+        </div>
+
+        <div class="plotcontainer" id="canvas"></div>
+
+        <div class="centerform">
+          <form method ="post" enctype="multipart/form-data" id="changeBand">
+                <input id="slide" type="range" min="0.5" max="10" step="0.1" value="1" name="slide">
+                <div id="sliderAmount"></div>
+          </form>
+        </div>
+
+        <script>
+          var slide = document.getElementById("slide");
+          $("input#slide").on("change", function(event) {
+            event.preventDefault();
+            plot_contour();
+          });
+        </script>
+
+        <script>
+          $("form#predict").submit(function(event) {
+            event.preventDefault();
+            plot_contour();
+          });
+        </script>
+
+      </div>
     </div>
 
-
-    <div>
-      <form id="define" method="POST">
-          <input type="submit" value="Define Problem">
-      </form>
-    </div>
-
-    <!-- Input tables -->
-    <div id="input">
-      Assign change effect values
-    </div>
-
-    <div id="output">
-      Assign monotonicity values
-    </div>
-
-    <div id="JacobianTable">
-      Choose Jacobian components to plot
-    </div>
-
-    <script>
-      $("form#define").submit(function(event) {
-        event.preventDefault();
-        $.ajax({
-          url: "/api/define",
-          type: "POST",
-          data: {},
-          success: function(response) {
-            deleteTable("input")
-            deleteTable("output")
-            deleteTable("JacobianTable")
-
-            addInputTable(response.nx,"input");
-            addInputTable(response.nf,"output");
-            addJacobian(response.nx,response.nf);
-          },
-          error: function(err) {
-            console.log(err);
-          }
-        });
-        return false
-      });
-    </script>
-
-    <div>
-      <form id="plot" method="POST">
-          <input type="submit" value="Plot projection">
-      </form>
-    </div>
-
-
-    <hr>
   </body>
 </html>

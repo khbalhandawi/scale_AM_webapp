@@ -1,4 +1,5 @@
 # web app packages
+# from asyncio.windows_events import NULL
 import requests
 from flask import Flask, render_template, redirect, session, url_for, request, jsonify
 from werkzeug.wrappers import Request, Response
@@ -22,7 +23,7 @@ warnings.filterwarnings("ignore",category=DeprecationWarning)
 warnings.filterwarnings("ignore",category=FutureWarning)
 warnings.filterwarnings("ignore",category=PendingDeprecationWarning)
 
-app=Flask(__name__,template_folder='./templates/')
+app=Flask(__name__,template_folder="./templates/")
 app.config["DEBUG"] = True
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 app.config["FILE_UPLOADS"] = "./static/file/uploads"
@@ -60,12 +61,16 @@ def index():
 
 		# store variables in the session
 		session["nx"] = len(dict_in)
+		session["input_columns"] = input_columns
 		session["nf"] = len(dict_out)
+		session["output_columns"] = output_columns
+		session["filepath"] = filepath
 		return redirect(request.referrer)
 
 	if request.method == "GET":
 		return render_template("index.html")  
 
+# get problem size
 @app.route("/api/define", methods=["POST"])
 def get_map():
 		if session.get("nx") and session.get("nf"):
@@ -74,50 +79,59 @@ def get_map():
 			dims = {"nx" : nx, "nf" : nf}
 			return jsonify(dims)
 
-
 # return model predictions
 @app.route("/api/predict", methods=["GET","POST"])
 def predict():
+
+	# Read data
+	data_df = pd.read_csv(session["filepath"])
+
 	msg_data={}
 	print("======================================")
 	jsonData = request.get_json()
-	for k in jsonData.keys():
-		val=jsonData.get(k)
-		msg_data[k]=val
+	print(jsonData)
 
-	input_df=pd.DataFrame(msg_data)
-	print(input_df)
+	x = np.array(data_df[session["input_columns"]])
+	f = np.array(data_df[session["output_columns"]])
 
-	# # Get X values from dataframe
-	# N_cases_in = np.reshape(input_df["ncases"].to_numpy(dtype=float),(len(input_df),1))
-	# Ct_in = np.reshape(input_df["Ct"].to_numpy(dtype=float),(len(input_df),1))
+	model = KSModel("PSpace")
+	model.train(x,f,bandwidth=float(jsonData["bandwidth"]))
+	# model.view([0,1],0)
 
-	# # Standardize X values and convert to tensor
-	# data_X = (np.concatenate((N_cases_in,Ct_in,),axis=1) - mean_in.to_numpy())/ std_in.to_numpy()
-	# data_X = torch.from_numpy(data_X).unsqueeze(0).float()
+	# scalability assessment
+	x1_i = jsonData["x-axis"]
+	x2_i = jsonData["y-axis"]
+	z_i = jsonData["z-axis"]
 
-	# # Set first value of Y tensor to last N_cases (yesterday) and standardize
-	# data_y = torch.ones((1,OUTPUT_DIM+1,NUM_FEATURES_OUT)) * N_cases_in[-1]
-	# data_y[:,1:,:] =  np.NaN
-	# data_y = (data_y - mean_out.to_numpy())/ std_out.to_numpy()
-	# data_y = data_y.float()
+	p = np.array(jsonData["change_effect"],dtype=float)
+	m = np.array(jsonData["monotonicity"],dtype=float)
+	s = scalability(p,m,model,"Himmelblau")
+	X,Y,Z,F,grad_F = s.compute_scalability([x1_i,x2_i],z_i,n_levels=15)
 
-	# # Perform inference
-	# [pred_mean, data_y_mean, pred_seq] = TestRun.predict(data_X.to(device), data_y.to(device), mean=mean_out, std=std_out, return_seq=True)
+	J = np.array(jsonData["Jacobian"]).reshape((session["nx"],session["nf"]))
 
-	# projection = pred_seq.squeeze().numpy().round().tolist()
-	# mean_pred = np.mean(projection)
-	# sum_pred = np.sum(projection)
-	# print("projection:")
-	# print(projection)
-	# print("average:")
-	# print(mean_pred)
-	# print("======================================")
+	cstrs = []
+	for i in range(J.shape[0]):	
+		for j in range(J.shape[1]):
+			if J[i,j]:
+				c = np.zeros(s.cstrs[(i,j)].shape)
+				c[s.cstrs[(i,j)]] = 1
+				c[~s.cstrs[(i,j)]] = 0
+				c = c.reshape(Z.shape).tolist()
+				for i in range(Z.shape[0]):
+					for j in range(Z.shape[1]):
+						c[i][j] = c[i][j] if c[i][j] == 1 else 0
+				cstrs += [c]
 
-	# # file_path = "models/Y_response.json"
-	# # json.dump(projection, codecs.open(file_path, "w", encoding="utf-8"), separators=(",", ":"), sort_keys=True, indent=4) ### this saves the array in .json format
+	if x1_i < x2_i:
+		x_vector=X[:,0]
+		y_vector=Y[0,:]
+		Z = Z.T
+	else:
+		x_vector=X[0,:]
+		y_vector=Y[:,0]
 
-	# return jsonify(projection=projection,average=mean_pred,sum=sum_pred)   
+	return jsonify(x=x_vector.tolist(),y=y_vector.tolist(),z=Z.tolist(),cstrs=cstrs)   
 
 if __name__ == "__main_":
 	app.config["DEBUG"] = True

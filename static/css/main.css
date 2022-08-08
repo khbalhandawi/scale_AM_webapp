@@ -7,12 +7,44 @@ html, body {
   html {
     height:100vh;
     width:100vw;
-    overflow:hidden;
+    overflow:scroll;
   }
   body {
     height: calc(100vh - 30px);
     width: calc(100vw - 50px);
     padding: 5px 25px;
+  }
+  form {
+      display: inline-block;
+  }
+  h1, h2 {
+    text-align: center;
+  }
+  p {
+    text-align: left;
+  }
+  .centerform, .slider {
+    text-align: center;
+  }
+  .plotcontainer {
+    background-color: lightblue;
+    overflow: scroll;
+    margin-left: auto;
+    margin-right: auto;
+    border: none;
+    text-align: center;
+    width: 650px;
+    height: 600px;
+  }
+  .column {
+    float: left;
+    width: 50%;
+  }
+  /* Clear floats after the columns */
+  .row:after {
+    content: "";
+    display: table;
+    clear: both;
   }
   .Yes, .No {
     margin: 10px;
