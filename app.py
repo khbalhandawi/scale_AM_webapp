@@ -190,6 +190,10 @@ def predict():
 	}
 	return jsonify(x=x_vector.tolist(),y=y_vector.tolist(),z=Z.tolist(),cstrs=cstrs,labels=labels)   
 
+@app.route("/download/")
+def download():
+    return render_template("download.html")
+
 if __name__ == "__main_":
 	app.debug = False
 	from werkzeug.serving import run_simple

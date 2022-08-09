@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Scalability of remanufacturing</title>
+    <meta charset="utf-8" />
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@9.0.1/dist/handsontable.full.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/0.10.0/lodash.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/handsontable@9.0.1/dist/handsontable.full.min.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="{{ url_for("static", filename="css/main.css") }}">
+  </head>
+  <body>
+    <header>
+      <img src="{{ url_for("static", filename="img/gradient_logo.png") }}">
+      <nav>
+        <ul>
+          <li><a href="../">Home</a></li>
+          <li><a href="./">Download</a></li>
+        </ul>
+      </nav>
+   </header>
+
+   <div id="download">
+    <table border="1" style="margin-left:0px;">
+      <thead>
+        <th>Dataset</th>
+        <th>Number of parameters</th>
+        <th>Number of variables</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td width="175" style="text-align: center;"><a href="{{ url_for("static", filename="data/himmelblau.csv") }}" download>Himmelblau</a></td>
+          <td width="175" style="text-align: center;">2</td>
+          <td width="175" style="text-align: center;">1</td>
+        </tr>
+        <tr>
+          <td width="175" style="text-align: center;"><a href="{{ url_for("static", filename="data/trs_data.csv") }}" download>TRS case study</a></td>
+          <td width="175" style="text-align: center;">3</td>
+          <td width="175" style="text-align: center;">4</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</body>
+</html>

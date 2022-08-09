@@ -1,7 +1,7 @@
 html, body {
     margin: 0;
     padding: 0;
-    font-family: Arial;
+    font-family: sans-serif;
     font-size: 12px;
   }
   html {
@@ -12,7 +12,34 @@ html, body {
   body {
     height: calc(100vh - 30px);
     width: calc(100vw - 50px);
+    margin-top: 80px;
     padding: 5px 25px;
+  }
+  header img {
+    height: 80px;
+    margin-left: 40px;
+  }
+  header {
+    background-color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    /* box-shadow: 0 0 25px 0 black; */
+  }
+  header * {
+    display: inline;
+  }
+  header li {
+    margin: 20px;
+  }
+  header li a {
+    color: black;
+    text-decoration: none;
+    font-size: 20px;
   }
   form {
       display: inline-block;
@@ -23,20 +50,38 @@ html, body {
   p {
     text-align: left;
   }
+  #my{
+    zoom: 135%;
+  }
   .content {
-    border: 1px solid red;
+    border: 2px solid black;
     max-width: 1000px;
-    margin: 0 auto;
-    text-align: center;
+    /* margin: 0 auto;
+    text-align: center; */
   }
   .JacobianTable, .output, .input {
     text-align: center;
   }
   table {
-    border:1px solid black;
+    border:1px none black;
     margin-left:auto;
     margin-right:auto;
   }
+
+  table td {
+    font-size: 1rem;
+    color: black;
+  }
+  
+  table th {
+    width: auto !important;
+    color: black;
+  }
+  
+  tbody tr:hover td, tbody tr:hover th {
+    background-color: #fff2f9;
+  }
+
   .centerform, .slider {
     text-align: center;
   }
