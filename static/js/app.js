@@ -49,6 +49,9 @@ function addInputTable(n_var,type,labels) {
         var th = document.createElement("TH");
         tableHead.appendChild(th);
         th.appendChild(document.createTextNode("y-axis"));
+        var th = document.createElement("TH");
+        tableHead.appendChild(th);
+        th.appendChild(document.createTextNode("nominal value"));
     } else if (type == "output") {
         var th = document.createElement("TH");
         tableHead.appendChild(th);
@@ -71,7 +74,7 @@ function addInputTable(n_var,type,labels) {
         // labels
         var td = document.createElement("TD");
         td.appendChild(document.createTextNode(labels[i])); // variable label
-        td.width="25";
+        td.width="75";
         tr.appendChild(td);
         
         if (type == "input") {
@@ -110,6 +113,23 @@ function addInputTable(n_var,type,labels) {
                 td.appendChild(radioDiv)
                 tr.appendChild(td);
             }
+
+            // nominal value selector
+            var td = document.createElement("TD");
+            td.width="75";
+            td.style="text-align:center";
+
+            var inputbox = document.createElement("input");
+            inputbox.type = "number";
+            inputbox.name = "nominal";
+            inputbox.value = 50;
+            inputbox.min=0
+            inputbox.max=100
+            inputbox.step=1
+            inputbox.id = "n"+(i+1);
+            td.appendChild(inputbox)
+            tr.appendChild(td);
+
         } else if (type == "output") {
             // numeric selectors
             var td = document.createElement("TD");
@@ -181,7 +201,7 @@ function addJacobian(nrows, ncols, i_labels, o_labels) {
         tableBody.appendChild(tr);
         var td = document.createElement("TD");
         td.appendChild(document.createTextNode(i_labels[i]));
-        td.width="25";
+        td.width="75";
         tr.appendChild(td);
         for (var j=0; j<ncols; j++){
             

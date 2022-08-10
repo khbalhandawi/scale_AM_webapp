@@ -113,10 +113,11 @@ def predict():
 	resolution = int(jsonData["resolution"])
 	intersect = bool(jsonData["intersect"])
 
+	n = np.array(jsonData["nominal"],dtype=float)/100.0
 	p = np.array(jsonData["change_effect"],dtype=float)
 	m = np.array(jsonData["monotonicity"],dtype=float)
 	s = scalability(p,m,model,"Himmelblau")
-	X,Y,Z,F,grad_F = s.compute_scalability([x1_i,x2_i],z_i,n_levels=resolution)
+	X,Y,Z,F,grad_F = s.compute_scalability([x1_i,x2_i],z_i,nominal=n,n_levels=resolution)
 
 	J = np.array(jsonData["Jacobian"]).reshape((session["nx"],session["nf"]))
 
