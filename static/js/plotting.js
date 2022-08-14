@@ -61,6 +61,7 @@ function plot_contour() {
           x: response.x,
           y: response.y,
           type: "contour",
+          opacity: 0.6,
           colorbar:{
             title: response.labels["zlabel"],
             side: "top",
@@ -96,7 +97,7 @@ function plot_contour() {
       
       Plotly.newPlot(canvas, data, layout);
       
-      var colors = ["#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
+      var colors = ["#8f0eff", "#2ca02c", "#0000ff", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
       var i = 0
       for (const cstr of response.cstrs) {
           var color = colors[cstr.order % colors.length]
